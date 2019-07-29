@@ -4,58 +4,39 @@ import Row from './row';
 
 export default class Table extends Component {
     state = {
-        inputRow: {
-          username: '',
-          firstName: '',
-          lastName: '',
-          sex: true
-        },
         rows: []
     }
-
-    changeHandler = (event) =>{
-        const {target:{value,name,type,checked}} = event;
-        const {inputRow} = this.state;
-        if (type === 'checkbox') {
-          this.setState({inputRow: {...inputRow, [name]: checked }});
-        } else {
-          this.setState({inputRow: {...inputRow, [name]: value }});
-        }
-    }
-
     
-    addRow = () =>{
-        const {inputRow,rows} = this.state;
-        if (inputRow.username && inputRow.firstName && inputRow.lastName) {
-        this.setState({rows: [...rows, inputRow],inputRow: {
-            username: '',
-            firstName: '',
-            lastName: '',
-            sex: true
-        }})
-        }
+    addRow = row =>{
+        const {rows} = this.state;
+        this.setState({rows: [...rows, row]})
     }
 
-    deleteRow = () =>{
+    deleteRow = id => (a) =>{
+        const {rows} = this.state;
+        rows.splice(rows.findIndex(row=>row.id === id),1);
+        this.setState({rows});
+    }
 
+    editRow = row =>{
+        debugger
+        const {rows} = this.state;
+        rows[rows.findIndex(_row=> _row.id === row.id)] = row;
+        this.setState({rows});
     }
 
     render() {
-        const {rows,inputRow:{username,firstName,lastName,sex}} = this.state;
-        const {changeHandler,addRow} = this;
+        const {rows} = this.state;
+        const {addRow,deleteRow,editRow,props:{columns}} = this;
         return <> {/* <React.Fragment> */}
           <h1>Editable Table</h1>
           <table>
             <Header
-                username={username}
-                firstName={firstName}
-                lastName={lastName}
-                sex={sex}
+                columns={columns}
                 addRow={addRow}
-                changeHandler={changeHandler}
             />
             <tbody>
-              {rows.map(row=><Row row={row} onDelete={deleteRow} />)}
+              {rows.map(row=><Row key={row.id} row={row} columns={columns} onDelete={deleteRow(row.id)} onEdit={editRow} />)}
             </tbody>
           </table>
         </>;
